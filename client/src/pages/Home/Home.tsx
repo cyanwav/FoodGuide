@@ -7,19 +7,26 @@ interface RestaurantInfo {
     name: string;
     location: string;
     uri: string;
-    img: string;
+    rating: number;
+    imgUri: string;
   }
   
-  interface Place {
-    id: string;
-    displayName: { text: string };
-    formattedAddress: string;
-    websiteUri?: string;
-  }
+//   interface Photo {
+//     name: string
+//   }
+
+//   interface Place {
+//     id: string;
+//     displayName: { text: string };
+//     formattedAddress: string;
+//     websiteUri?: string;
+//     rating: number;
+//     photos: Photo[];
+//   }
   
-  interface ResponseData {
-    places: Place[];
-  }
+//   interface ResponseData {
+//     places: Place[];
+//   }
 
   
 const Home: React.FC = () => {
@@ -80,15 +87,18 @@ const Home: React.FC = () => {
         throw new Error('Network response was not ok');
       }
 
-      const data: ResponseData = await response.json();
-      console.log(data);
-      const infoList: RestaurantInfo[] = data.places.map(place => ({
-        id: place.id,
-        name: place.displayName.text,
-        location: place.formattedAddress,
-        uri: place.websiteUri ?? '',
-        img: '' // ! change it later
-      }));
+      const infoList: RestaurantInfo[] = await response.json();
+    //   const data: ResponseData = await response.json();
+    //   console.log(data);
+    //   const infoList: RestaurantInfo[] = data.places.map(place => ({
+    //     id: place.id,
+    //     name: place.displayName.text,
+    //     location: place.formattedAddress,
+    //     uri: place.websiteUri ?? '',
+    //     rating: place.rating,
+    //     img: place.photos[0]?.name
+    //   }));
+    console.log('Received:')
       console.log(infoList);
       setResponse(infoList);
       
@@ -179,7 +189,7 @@ const Home: React.FC = () => {
                                         <div className="portfolio-hover">
                                             <div className="portfolio-hover-content"><i className="fas fa-plus fa-3x"></i></div>
                                         </div>
-                                        <img className="img-fluid" src={place.img} alt={place.name} />
+                                        <img className="img-fluid" src={place.imgUri} alt={place.name} />
                                     </a>
                                     <div className="portfolio-caption">
                                         <div className="portfolio-caption-heading">{place.name}</div>

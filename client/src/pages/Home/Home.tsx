@@ -7,6 +7,7 @@ interface RestaurantInfo {
     name: string;
     location: string;
     uri: string;
+    img: string;
   }
   
   interface Place {
@@ -85,7 +86,8 @@ const Home: React.FC = () => {
         id: place.id,
         name: place.displayName.text,
         location: place.formattedAddress,
-        uri: place.websiteUri ?? ''
+        uri: place.websiteUri ?? '',
+        img: '' // ! change it later
       }));
       console.log(infoList);
       setResponse(infoList);
@@ -154,7 +156,7 @@ const Home: React.FC = () => {
                         ) : latitude && longitude ? (
                         <div>
                             <p>Latitude: {latitude}, Longitude: {longitude}</p>
-                            {response ? (
+                            {/* {response ? (
                             response.map((place, index) => (
                                 <div key={index}>
                                 <h3>Restaurant {index + 1}</h3>
@@ -163,14 +165,50 @@ const Home: React.FC = () => {
                             ))
                             ) : (
                             <p>No response received</p>
-                            )}
+                            )} */}
                         </div>
                         ) : (
                         <p>Loading location...</p>
                         )}
                     </div>
                     <div className="row">
-                        {portfolioItems.map((item, index) => (
+                        {response?.map((place, index) => (
+                            <div className="col-lg-4 col-sm-6 mb-4" key={index}>
+                                <div className="portfolio-item">
+                                    <a className="portfolio-link" data-bs-toggle="modal" href={`#portfolioModal${index + 1}`}>
+                                        <div className="portfolio-hover">
+                                            <div className="portfolio-hover-content"><i className="fas fa-plus fa-3x"></i></div>
+                                        </div>
+                                        <img className="img-fluid" src={place.img} alt={place.name} />
+                                    </a>
+                                    <div className="portfolio-caption">
+                                        <div className="portfolio-caption-heading">{place.name}</div>
+                                        <div className="portfolio-caption-subheading text-muted">{place.id}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        {/* {
+                            portfolioItems.map((item, index) => (
+                                <div className="col-lg-4 col-sm-6 mb-4" key={index}>
+                                    <div className="portfolio-item">
+                                        <a className="portfolio-link" data-bs-toggle="modal" href={`#portfolioModal${index + 1}`}>
+                                            <div className="portfolio-hover">
+                                                <div className="portfolio-hover-content"><i className="fas fa-plus fa-3x"></i></div>
+                                            </div>
+                                            <img className="img-fluid" src={item.img} alt={item.alt} />
+                                        </a>
+                                        <div className="portfolio-caption">
+                                            <div className="portfolio-caption-heading">{item.heading}</div>
+                                            <div className="portfolio-caption-subheading text-muted">{item.subheading}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        } */}
+                        
+                    
+                        {/* {portfolioItems.map((item, index) => (
                             <div className="col-lg-4 col-sm-6 mb-4" key={index}>
                                 <div className="portfolio-item">
                                     <a className="portfolio-link" data-bs-toggle="modal" href={`#portfolioModal${index + 1}`}>
@@ -185,7 +223,7 @@ const Home: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                        ))}
+                        ))} */}
                     </div>
                 </div>
             </section>

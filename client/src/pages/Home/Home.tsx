@@ -165,7 +165,7 @@ const Home: React.FC = () => {
                         <p>Sending location...</p>
                         ) : latitude && longitude ? (
                         <div>
-                            <p>Latitude: {latitude}, Longitude: {longitude}</p>
+                            {/* <p>Latitude: {latitude}, Longitude: {longitude}</p> */}
                             {/* {response ? (
                             response.map((place, index) => (
                                 <div key={index}>
@@ -193,7 +193,7 @@ const Home: React.FC = () => {
                                     </a>
                                     <div className="portfolio-caption">
                                         <div className="portfolio-caption-heading">{place.name}</div>
-                                        <div className="portfolio-caption-subheading text-muted">{place.id}</div>
+                                        <div className="portfolio-caption-subheading text-muted">{place.location}</div>
                                     </div>
                                 </div>
                             </div>

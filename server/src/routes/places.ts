@@ -35,7 +35,7 @@ async function fetchNearbyPlaces(lat: number, lng: number) {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask': 'places.displayName',
+        'X-Goog-FieldMask': 'places.id,places.displayName.text,places.formattedAddress,places.websiteUri',
       },
       body: JSON.stringify(requestBody),
     });

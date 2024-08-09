@@ -1,0 +1,8 @@
+// Import Bootstrap's SCSS
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+// Custom styles
+$primary-color: #ffd755;
+body {
+  background-color: $primary-color;
+}

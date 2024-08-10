@@ -41,7 +41,6 @@ async function fetchPlaceMedia(photoName: string): Promise<string> {
   const apiKey = process.env.REACT_APP_GOOGLE_API_KEY;
   const url = `https://places.googleapis.com/v1/${photoName}/media?${parameters}&key=${apiKey}&skipHttpRedirect=true`;
   try {
-      console.log('start fetching: ', photoName);
       const response = await fetch(url, {
         method: 'GET', 
         headers: {
@@ -52,28 +51,11 @@ async function fetchPlaceMedia(photoName: string): Promise<string> {
           throw new Error(`HTTP error! status: ${response.status}`);
       }
       const photo = await response.json();
-      console.log(photo);
       return photo.photoUri;
       
   } catch (error) {
       console.error('Error fetching the place media:', error);
   }
-}
-
-
-async function getValidImageUri(photos: Photo[]): Promise<string> {
-  for (const photo of photos) {
-    try {
-      const imgUri = await fetchPlaceMedia(photo.name);
-      if (imgUri) {
-        return imgUri;
-      }
-    } catch (error) {
-      console.error(`Failed to fetch image for ${photo.name}:`, error);
-    }
-  }
-  return '';
-  // throw new Error('No valid image URI found.');
 }
 
 async function getInfoList(data: ResponseData): Promise<RestaurantInfo[]> {
@@ -112,7 +94,7 @@ async function fetchNearbyPlaces(lat: number, lng: number) {
             latitude: lat,
             longitude: lng,
           },
-          radius: 500.0,
+          radius: 1000.0,
         },
       },
     };
@@ -134,8 +116,35 @@ async function fetchNearbyPlaces(lat: number, lng: number) {
     const data = await response.json();
     return data;
   }
+
+// get restaurant details
+async function fetchPlaceDetails(id: string) {
+  const apiKey = process.env.REACT_APP_GOOGLE_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('API key not configured');
+  }
+  
+  const url = `https://places.googleapis.com/v1/places/${id}`;
   
 
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': apiKey,
+      'X-Goog-FieldMask': 'id,displayName,types,formattedAddress,rating,websiteUri,currentOpeningHours,reviews'
+    }
+  })
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  console.log('place details fetched: ', data);
+  return data;
+}
 
 // Define routes
 async function apiRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
@@ -165,6 +174,24 @@ async function apiRoutes(fastify: FastifyInstance, options: FastifyPluginOptions
     } catch (error) {
       console.error('Error:', error);
       reply.status(500).send({ error: 'An error occurred while fetching data' });
+    }
+  });
+
+  // get specific place details
+  fastify.get('/api/res/:id', async (request, reply) => {
+    try {
+      const { id } = request.params as { id: string };
+      
+      if (!id) {
+        return reply.status(400).send({ error: 'Missing restaurant ID' });
+      }
+      
+      const placeDetails = await fetchPlaceDetails(id);
+      reply.send(placeDetails);
+
+    } catch (error) {
+      console.error('Error:', error);
+      reply.status(500).send({ error: 'An error occurred while fetching place details' });
     }
   });
 }

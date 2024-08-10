@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './css/styles.css';
-import { portfolioItems } from './portfolioItems';
 
 interface RestaurantInfo {
     id: string;
@@ -10,23 +9,15 @@ interface RestaurantInfo {
     rating: number;
     imgUri: string;
   }
-  
-//   interface Photo {
-//     name: string
-//   }
 
-//   interface Place {
-//     id: string;
-//     displayName: { text: string };
-//     formattedAddress: string;
-//     websiteUri?: string;
-//     rating: number;
-//     photos: Photo[];
-//   }
-  
-//   interface ResponseData {
-//     places: Place[];
-//   }
+interface RestaurantDetails {
+    id: string;
+    name: string;
+    location: string;
+    uri: string;
+    rating: number;
+    imgUri: string;
+}
 
   
 const Home: React.FC = () => {
@@ -35,34 +26,38 @@ const Home: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [response, setResponse] = useState<RestaurantInfo[] | null>(null);
+  const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantDetails | null>(null);
 
   useEffect(() => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          setLatitude(lat);
-          setLongitude(lon);
-          sendLocationToServer(lat, lon); // Call the function to send data to the server
-        },
-        (error) => {
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              setError("User denied the request for Geolocation.");
-              break;
-            case error.POSITION_UNAVAILABLE:
-              setError("Location information is unavailable.");
-              break;
-            case error.TIMEOUT:
-              setError("The request to get user location timed out.");
-              break;
-            default:
-              setError("An unknown error occurred.");
-              break;
-          }
-        }
-      );
+      if(!localStorage.position) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const lat = position.coords.latitude;
+              const lon = position.coords.longitude;
+              localStorage.position = JSON.stringify({latitude: lat, longitude: lon});
+              setLatitude(lat);
+              setLongitude(lon);
+              sendLocationToServer(lat, lon); // Call the function to send data to the server
+            },
+            (error) => {
+              switch (error.code) {
+                case error.PERMISSION_DENIED:
+                  setError("User denied the request for Geolocation.");
+                  break;
+                case error.POSITION_UNAVAILABLE:
+                  setError("Location information is unavailable.");
+                  break;
+                case error.TIMEOUT:
+                  setError("The request to get user location timed out.");
+                  break;
+                default:
+                  setError("An unknown error occurred.");
+                  break;
+              }
+            }
+          );
+      }
     } else {
       setError("Geolocation is not supported by this browser.");
     }
@@ -81,26 +76,16 @@ const Home: React.FC = () => {
         body: JSON.stringify({ latitude, longitude }),
       });
 
-      console.log(response);
+    //   console.log(response);
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
 
       const infoList: RestaurantInfo[] = await response.json();
-    //   const data: ResponseData = await response.json();
-    //   console.log(data);
-    //   const infoList: RestaurantInfo[] = data.places.map(place => ({
-    //     id: place.id,
-    //     name: place.displayName.text,
-    //     location: place.formattedAddress,
-    //     uri: place.websiteUri ?? '',
-    //     rating: place.rating,
-    //     img: place.photos[0]?.name
-    //   }));
-    console.log('Received:')
-      console.log(infoList);
+
       setResponse(infoList);
+      
       
     } catch (error) {
       if (error instanceof Error) {
@@ -112,6 +97,36 @@ const Home: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const getRestaurantDetails = async (id: string) => {
+    console.log(JSON.stringify({ latitude, longitude }));
+    try {
+      const response = await fetch(`http://localhost:3000/api/res/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data: RestaurantDetails = await response.json();
+      setSelectedRestaurant(data);
+      
+      
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(`Failed to get restaurant details: ${error.message}`);
+      } else {
+        setError('An unknown error occurred');
+      }
+    }
+  };
+
+
+
     return (
         <div id="page-top">
             {/* Navigation */}
@@ -135,7 +150,7 @@ const Home: React.FC = () => {
                     <div className="collapse navbar-collapse" id="navbarResponsive">
                         <ul className="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
                             <li className="nav-item">
-                                <a className="nav-link" href="#portfolio">Explore</a>
+                                <a className="nav-link" href="#restaurant">Explore</a>
                             </li>
                         </ul>
                     </div>
@@ -147,12 +162,12 @@ const Home: React.FC = () => {
                 <div className="container">
                     <div className="masthead-subheading">Welcome To FoodGuide</div>
                     <div className="masthead-heading text-uppercase">Discover New Restaurants!</div>
-                    <a className="btn btn-primary btn-xl text-uppercase" href="#services">Tell Me More</a>
+                    <a className="btn btn-primary btn-xl text-uppercase" href="#restaurant">Explore</a>
                 </div>
             </header>
 
-            {/* Portfolio Grid */}
-            <section className="page-section bg-light" id="portfolio">
+            {/* restaurant Grid */}
+            <section className="page-section bg-light" id="restaurant">
                 <div className="container">
                     <div className="text-center">
                         <h2 className="section-heading text-uppercase">Nearby Choices</h2>
@@ -184,56 +199,20 @@ const Home: React.FC = () => {
                     <div className="row">
                         {response?.map((place, index) => (
                             <div className="col-lg-4 col-sm-6 mb-4" key={index}>
-                                <div className="portfolio-item">
-                                    <a className="portfolio-link" data-bs-toggle="modal" href={`#portfolioModal${index + 1}`}>
-                                        <div className="portfolio-hover">
-                                            <div className="portfolio-hover-content"><i className="fas fa-plus fa-3x"></i></div>
+                                <div className="restaurant-item">
+                                    <a className="restaurant-link" data-bs-toggle="modal" href={`#restaurantModal${index + 1}`} onClick={() => getRestaurantDetails(place.id)}>
+                                        <div className="restaurant-hover">
+                                            <div className="restaurant-hover-content"><i className="fas fa-plus fa-3x"></i></div>
                                         </div>
                                         <img className="img-fluid" src={place.imgUri} alt={place.name} />
                                     </a>
-                                    <div className="portfolio-caption">
-                                        <div className="portfolio-caption-heading">{place.name}</div>
-                                        <div className="portfolio-caption-subheading text-muted">{place.location}</div>
+                                    <div className="restaurant-caption">
+                                        <div className="restaurant-caption-heading">{place.name}</div>
+                                        <div className="restaurant-caption-subheading text-muted">{place.id}</div>
                                     </div>
                                 </div>
                             </div>
                         ))}
-                        {/* {
-                            portfolioItems.map((item, index) => (
-                                <div className="col-lg-4 col-sm-6 mb-4" key={index}>
-                                    <div className="portfolio-item">
-                                        <a className="portfolio-link" data-bs-toggle="modal" href={`#portfolioModal${index + 1}`}>
-                                            <div className="portfolio-hover">
-                                                <div className="portfolio-hover-content"><i className="fas fa-plus fa-3x"></i></div>
-                                            </div>
-                                            <img className="img-fluid" src={item.img} alt={item.alt} />
-                                        </a>
-                                        <div className="portfolio-caption">
-                                            <div className="portfolio-caption-heading">{item.heading}</div>
-                                            <div className="portfolio-caption-subheading text-muted">{item.subheading}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-                        } */}
-                        
-                    
-                        {/* {portfolioItems.map((item, index) => (
-                            <div className="col-lg-4 col-sm-6 mb-4" key={index}>
-                                <div className="portfolio-item">
-                                    <a className="portfolio-link" data-bs-toggle="modal" href={`#portfolioModal${index + 1}`}>
-                                        <div className="portfolio-hover">
-                                            <div className="portfolio-hover-content"><i className="fas fa-plus fa-3x"></i></div>
-                                        </div>
-                                        <img className="img-fluid" src={item.img} alt={item.alt} />
-                                    </a>
-                                    <div className="portfolio-caption">
-                                        <div className="portfolio-caption-heading">{item.heading}</div>
-                                        <div className="portfolio-caption-subheading text-muted">{item.subheading}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))} */}
                     </div>
                 </div>
             </section>
@@ -247,9 +226,9 @@ const Home: React.FC = () => {
                 </div>
             </footer>
 
-            {/* Portfolio Modals */}
-            {portfolioItems.map((item, index) => (
-                <div className="portfolio-modal modal fade" id={`portfolioModal${index + 1}`} tabIndex={-1} role="dialog" aria-hidden="true" key={index}>
+            {/* restaurant Modals */}
+            {response?.map((place, index) => (
+                <div className="restaurant-modal modal fade" id={`restaurantModal${index + 1}`} tabIndex={-1} role="dialog" aria-hidden="true" key={index}>
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="close-modal" data-bs-dismiss="modal">
@@ -260,22 +239,23 @@ const Home: React.FC = () => {
                                     <div className="col-lg-8">
                                         <div className="modal-body">
                                             {/* Project details */}
-                                            <h2 className="text-uppercase">{item.heading}</h2>
-                                            <p className="item-intro text-muted">{item.intro}</p>
-                                            <img className="img-fluid d-block mx-auto" src={item.img} alt={item.alt} />
-                                            <p>{item.description}</p>
-                                            <ul className="list-inline">
+                                            <h2 className="text-uppercase">{selectedRestaurant?.name || place.name}</h2>
+                                            <p className="item-intro text-muted">{selectedRestaurant?.location || place.location}</p>
+                                            <img className="img-fluid d-block mx-auto" src={place.imgUri} alt={place.name} />
+                                            <p>{place.rating}</p>
+                                            <a href={selectedRestaurant?.uri || place.uri}>Website</a>
+                                            {/* <ul className="list-inline">
                                                 <li>
                                                     <strong>Client:</strong> {item.client}
                                                 </li>
                                                 <li>
                                                     <strong>Category:</strong> {item.category}
                                                 </li>
-                                            </ul>
-                                            <button className="btn btn-primary btn-xl text-uppercase" data-bs-dismiss="modal" type="button">
+                                            </ul> */}
+                                            {/* <button className="btn btn-primary btn-xl text-uppercase" data-bs-dismiss="modal" type="button">
                                                 <i className="fas fa-xmark me-1"></i>
                                                 Close Project
-                                            </button>
+                                            </button> */}
                                         </div>
                                     </div>
                                 </div>

@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import './css/styles.css';
 
+interface Location {
+    latitude: number,
+    longitude: number
+}
+
 interface RestaurantInfo {
-    id: string;
-    name: string;
-    location: string;
-    uri: string;
-    rating: number;
-    imgUri: string;
-  }
+    id: string,
+    name: string,
+    address: string,
+    location: Location,
+    uri: string,
+    rating: number,
+    imgUri: string
+}
 
 interface Review {
     author: string,
@@ -22,113 +31,109 @@ interface RestaurantDetails {
     reviews: Review[]
 }
 
-  
 const Home: React.FC = () => {
     const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState<RestaurantInfo[] | null>(null);
-  const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantDetails | null>(null);
+    const [longitude, setLongitude] = useState<number | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [response, setResponse] = useState<RestaurantInfo[] | null>(null);
+    const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantDetails | null>(null);
 
-  useEffect(() => {
-    if (navigator.geolocation) {
-      if(!localStorage.position) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const lat = position.coords.latitude;
-              const lon = position.coords.longitude;
-              localStorage.position = JSON.stringify({latitude: lat, longitude: lon});
-              setLatitude(lat);
-              setLongitude(lon);
-              sendLocationToServer(lat, lon); // Call the function to send data to the server
-            },
-            (error) => {
-              switch (error.code) {
-                case error.PERMISSION_DENIED:
-                  setError("User denied the request for Geolocation.");
-                  break;
-                case error.POSITION_UNAVAILABLE:
-                  setError("Location information is unavailable.");
-                  break;
-                case error.TIMEOUT:
-                  setError("The request to get user location timed out.");
-                  break;
-                default:
-                  setError("An unknown error occurred.");
-                  break;
-              }
+    useEffect(() => {
+        if (navigator.geolocation) {
+            if(!localStorage.position) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        localStorage.position = JSON.stringify({latitude: lat, longitude: lon});
+                        setLatitude(lat);
+                        setLongitude(lon);
+                        sendLocationToServer(lat, lon); // Call the function to send data to the server
+                    },
+                    (error) => {
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                setError("User denied the request for Geolocation.");
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                setError("Location information is unavailable.");
+                                break;
+                            case error.TIMEOUT:
+                                setError("The request to get user location timed out.");
+                                break;
+                            default:
+                                setError("An unknown error occurred.");
+                                break;
+                        }
+                    }
+                );
             }
-          );
-      }
-    } else {
-      setError("Geolocation is not supported by this browser.");
-    }
-  }, []);
-
-  // Function to send the location to the server
-  const sendLocationToServer = async (latitude: number, longitude: number) => {
-    setLoading(true);
-    console.log(JSON.stringify({ latitude, longitude }));
-    try {
-      const response = await fetch('http://localhost:3000/api/res', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ latitude, longitude }),
-      });
-
-    //   console.log(response);
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const infoList: RestaurantInfo[] = await response.json();
-
-      setResponse(infoList);
-      
-      
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(`Failed to send location data: ${error.message}`);
-      } else {
-        setError('An unknown error occurred');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getRestaurantDetails = async (id: string) => {
-    console.log(JSON.stringify({ latitude, longitude }));
-    try {
-      const response = await fetch(`http://localhost:3000/api/res/${id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
+        } else {
+            setError("Geolocation is not supported by this browser.");
         }
-      });
+    }, []);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
+    const sendLocationToServer = async (latitude: number, longitude: number) => {
+        setLoading(true);
+        console.log(JSON.stringify({ latitude, longitude }));
+        try {
+            const response = await fetch('http://localhost:3000/api/res', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ latitude, longitude }),
+            });
 
-      const data: RestaurantDetails = await response.json();
-      setSelectedRestaurant(data);
-      
-      
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(`Failed to get restaurant details: ${error.message}`);
-      } else {
-        setError('An unknown error occurred');
-      }
-    }
-  };
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
 
+            const infoList: RestaurantInfo[] = await response.json();
+            setResponse(infoList);
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(`Failed to send location data: ${error.message}`);
+            } else {
+                setError('An unknown error occurred');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    const getRestaurantDetails = async (id: string) => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/res/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data: RestaurantDetails = await response.json();
+            setSelectedRestaurant(data);
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(`Failed to get restaurant details: ${error.message}`);
+            } else {
+                setError('An unknown error occurred');
+            }
+        }
+    };
+
+    const defaultIcon = new L.Icon({
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
 
     return (
         <div id="page-top">
@@ -220,6 +225,42 @@ const Home: React.FC = () => {
                 </div>
             </section>
 
+            {/* Leaflet Map */}
+            <section className="map-section">
+                <div className="container">
+                    <div className="text-center">
+                        <h2 className="section-heading text-uppercase">Restaurant Map</h2>
+                    </div>
+                    {latitude && longitude && (
+                        <MapContainer
+                            center={[latitude, longitude]}
+                            zoom={14}
+                            style={{ height: '400px', width: '100%' }}
+                        >
+                            <TileLayer
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            />
+                            {response?.map((place, index) => (
+                                <Marker
+                                    key={index}
+                                    position={[place.location.latitude, place.location.longitude]}
+                                    icon={defaultIcon}
+                                >
+                                    <Popup>
+                                        <div>
+                                            <h3>{place.name}</h3>
+                                            <p>{place.address}</p>
+                                            <p>Rating: {place.rating}</p>
+                                        </div>
+                                    </Popup>
+                                </Marker>
+                            ))}
+                        </MapContainer>
+                    )}
+                </div>
+            </section>
+
             {/* Footer */}
             <footer className="footer py-4">
                 <div className="container">
@@ -241,9 +282,8 @@ const Home: React.FC = () => {
                                 <div className="row justify-content-center">
                                     <div className="col-lg-8">
                                         <div className="modal-body">
-                                            {/* Project details */}
                                             <h2 className="text-uppercase">{place.name}</h2>
-                                            <p className="item-intro text-muted">{place.location}</p>
+                                            <p className="item-intro text-muted">{place.address}</p>
                                             <img className="img-fluid d-block mx-auto" src={place.imgUri} alt={place.name} />
                                             <p>{place.rating}</p>
                                             <a href={place.uri}>Website</a>

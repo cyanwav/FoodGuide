@@ -2,7 +2,7 @@
 
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 
-interface LocationRequestBody {
+interface Location {
     latitude: number;
     longitude: number;
   }
@@ -15,6 +15,7 @@ interface Place {
   id: string;
   displayName: { text: string };
   formattedAddress: string;
+  location: Location;
   websiteUri?: string;
   rating: number;
   photos: Photo[];
@@ -25,12 +26,13 @@ interface ResponseData {
 }
 
 interface RestaurantInfo {
-  id: string;
-  name: string;
-  location: string;
-  uri: string;
-  rating: number;
-  imgUri: string;
+  id: string,
+  name: string,
+  address: string,
+  location: Location,
+  uri: string,
+  rating: number,
+  imgUri: string
 }
 
 interface Review {
@@ -79,7 +81,8 @@ async function getInfoList(data: ResponseData): Promise<RestaurantInfo[]> {
       return {
         id: place.id,
         name: place.displayName.text,
-        location: place.formattedAddress,
+        address: place.formattedAddress,
+        location: {latitude: place.location.latitude, longitude: place.location.longitude},
         uri: place.websiteUri ?? '',
         rating: place.rating,
         imgUri: imgUri,
@@ -89,6 +92,8 @@ async function getInfoList(data: ResponseData): Promise<RestaurantInfo[]> {
   return infoList;
 }
 
+
+// get several restaurants nearby
 async function fetchNearbyPlaces(lat: number, lng: number) {
     const apiKey = process.env.REACT_APP_GOOGLE_API_KEY;
   
@@ -116,7 +121,7 @@ async function fetchNearbyPlaces(lat: number, lng: number) {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask': 'places.id,places.displayName.text,places.formattedAddress,places.websiteUri,places.rating,places.photos.name',
+        'X-Goog-FieldMask': 'places.id,places.displayName.text,places.formattedAddress,places.location,places.websiteUri,places.rating,places.photos.name',
       },
       body: JSON.stringify(requestBody),
     });
@@ -178,7 +183,7 @@ async function apiRoutes(fastify: FastifyInstance, options: FastifyPluginOptions
   // get nearby places
   fastify.post('/api/res', async (request, reply) => {
     try {
-        const { latitude, longitude } = request.body as LocationRequestBody;
+        const { latitude, longitude } = request.body as Location;
         
         if (typeof latitude !== 'number' || typeof longitude !== 'number') {
           return reply.status(400).send({ error: 'Invalid or missing latitude/longitude' });

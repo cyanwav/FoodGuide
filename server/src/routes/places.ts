@@ -33,6 +33,18 @@ interface RestaurantInfo {
   imgUri: string;
 }
 
+interface Review {
+  author: string,
+  text: string,
+  relativetime: string,
+}
+
+interface RestaurantDetails {
+  openNow: boolean,
+  openingHours: string[],
+  reviews: Review[]
+}
+
 // Methods
 
 // get photo
@@ -118,22 +130,20 @@ async function fetchNearbyPlaces(lat: number, lng: number) {
   }
 
 // get restaurant details
-async function fetchPlaceDetails(id: string) {
+async function getPlaceDetails(id: string) {
   const apiKey = process.env.REACT_APP_GOOGLE_API_KEY;
-
   if (!apiKey) {
     throw new Error('API key not configured');
   }
   
   const url = `https://places.googleapis.com/v1/places/${id}`;
   
-
   const response = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': apiKey,
-      'X-Goog-FieldMask': 'id,displayName,types,formattedAddress,rating,websiteUri,currentOpeningHours,reviews'
+      'X-Goog-FieldMask': 'currentOpeningHours.weekdayDescriptions,currentOpeningHours.openNow,reviews'
     }
   })
 
@@ -143,7 +153,18 @@ async function fetchPlaceDetails(id: string) {
 
   const data = await response.json();
   console.log('place details fetched: ', data);
-  return data;
+
+  const details: RestaurantDetails = {
+    openNow: data.openNow,
+    openingHours: data.currentOpeningHours?.weekdayDescriptions || [], 
+    reviews: data.reviews.slice(0, 3).map(review => ({
+        author: review.authorAttribution?.displayName || 'Unknown', 
+        text: review.originalText?.text || 'No text available',
+        relativetime: review.relativePublishTimeDescription || 'No time description available',
+    }))
+  };
+  console.log('details: ', details);
+  return details;
 }
 
 // Define routes
@@ -165,10 +186,8 @@ async function apiRoutes(fastify: FastifyInstance, options: FastifyPluginOptions
         
         console.log('get position: ', latitude, longitude)
         const data = await fetchNearbyPlaces(latitude, longitude);
-        console.log(data);
+        // console.log(data);
         const infoList = await getInfoList(data);
-        console.log('infolist');
-        console.log(infoList);
         reply.send(infoList);
 
     } catch (error) {
@@ -186,7 +205,7 @@ async function apiRoutes(fastify: FastifyInstance, options: FastifyPluginOptions
         return reply.status(400).send({ error: 'Missing restaurant ID' });
       }
       
-      const placeDetails = await fetchPlaceDetails(id);
+      const placeDetails = await getPlaceDetails(id);
       reply.send(placeDetails);
 
     } catch (error) {

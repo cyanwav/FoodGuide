@@ -10,13 +10,16 @@ interface RestaurantInfo {
     imgUri: string;
   }
 
+interface Review {
+    author: string,
+    text: string,
+    relativetime: string,
+}
+
 interface RestaurantDetails {
-    id: string;
-    name: string;
-    location: string;
-    uri: string;
-    rating: number;
-    imgUri: string;
+    openNow: boolean,
+    openingHours: string[],
+    reviews: Review[]
 }
 
   
@@ -239,11 +242,18 @@ const Home: React.FC = () => {
                                     <div className="col-lg-8">
                                         <div className="modal-body">
                                             {/* Project details */}
-                                            <h2 className="text-uppercase">{selectedRestaurant?.name || place.name}</h2>
-                                            <p className="item-intro text-muted">{selectedRestaurant?.location || place.location}</p>
+                                            <h2 className="text-uppercase">{place.name}</h2>
+                                            <p className="item-intro text-muted">{place.location}</p>
                                             <img className="img-fluid d-block mx-auto" src={place.imgUri} alt={place.name} />
                                             <p>{place.rating}</p>
-                                            <a href={selectedRestaurant?.uri || place.uri}>Website</a>
+                                            <a href={place.uri}>Website</a>
+                                            {selectedRestaurant && selectedRestaurant.openingHours && (
+                                            <ul>
+                                                {selectedRestaurant.openingHours.map((hour, i) => (
+                                                <li key={i}>{hour}</li>
+                                                ))}
+                                            </ul>
+                                            )}
                                             {/* <ul className="list-inline">
                                                 <li>
                                                     <strong>Client:</strong> {item.client}

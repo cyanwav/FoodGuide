@@ -38,6 +38,10 @@ const Home: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [response, setResponse] = useState<RestaurantInfo[] | null>(null);
     const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantDetails | null>(null);
+    const [selectedDistance, setSelectedDistance] = useState<number>(500); // 默认 500m
+
+
+
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -74,22 +78,30 @@ const Home: React.FC = () => {
         }
     }, []);
 
-    const sendLocationToServer = async (latitude: number, longitude: number) => {
+    const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = parseInt(event.target.value, 10);
+        setSelectedDistance(value);
+        if (latitude && longitude) {
+            sendLocationToServer(latitude, longitude, value);
+        }
+    };
+
+    const sendLocationToServer = async (latitude: number, longitude: number, distance: number = 500) => {
         setLoading(true);
-        console.log(JSON.stringify({ latitude, longitude }));
+        console.log(JSON.stringify({ latitude, longitude, distance }));
         try {
             const response = await fetch('http://localhost:3000/api/res', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ latitude, longitude }),
+                body: JSON.stringify({ latitude, longitude, distance }),
             });
-
+    
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-
+    
             const infoList: RestaurantInfo[] = await response.json();
             setResponse(infoList);
         } catch (error) {
@@ -134,6 +146,8 @@ const Home: React.FC = () => {
         popupAnchor: [1, -34],
         shadowSize: [41, 41]
     });
+
+
 
     return (
         <div id="page-top">
@@ -181,6 +195,22 @@ const Home: React.FC = () => {
                         <h2 className="section-heading text-uppercase">Nearby Choices</h2>
                         <h3 className="section-subheading text-muted">Explore top-rated restaurants near you.</h3>
                     </div>
+                    <div className="mb-3">
+                        <label htmlFor="distance-filter" className="form-label">
+                            Filter by distance:
+                        </label>
+                        <select
+                            id="distance-filter"
+                            className="form-select"
+                            value={selectedDistance}
+                            onChange={handleFilterChange}
+                        >
+                            <option value={500}>500m</option>
+                            <option value={1000}>1km</option>
+                            <option value={2000}>2km</option>
+                            <option value={3000}>3km</option>
+                        </select>
+                    </div>
                     <div className='location'>
                         {error ? (
                         <p>{error}</p>
@@ -216,7 +246,7 @@ const Home: React.FC = () => {
                                     </a>
                                     <div className="restaurant-caption">
                                         <div className="restaurant-caption-heading">{place.name}</div>
-                                        <div className="restaurant-caption-subheading text-muted">{place.id}</div>
+                                        <div className="restaurant-caption-subheading text-muted">{place.address}</div>
                                     </div>
                                 </div>
                             </div>
@@ -231,7 +261,7 @@ const Home: React.FC = () => {
                     <div className="text-center">
                         <h2 className="section-heading text-uppercase">Restaurant Map</h2>
                     </div>
-                    {latitude && longitude && (
+                    {latitude && longitude && response && (
                         <MapContainer
                             center={[latitude, longitude]}
                             zoom={14}
@@ -241,7 +271,7 @@ const Home: React.FC = () => {
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                             />
-                            {response?.map((place, index) => (
+                            {response.map((place, index) => (
                                 <Marker
                                     key={index}
                                     position={[place.location.latitude, place.location.longitude]}
@@ -265,7 +295,7 @@ const Home: React.FC = () => {
             <footer className="footer py-4">
                 <div className="container">
                     <div className="row align-items-center">
-                        <div className="col-lg-4 text-lg-start">Copyright &copy; Your Website 2023</div>
+                        <div className="col-lg-4 text-lg-start">Copyright &copy; FoodGuide 2024</div>
                     </div>
                 </div>
             </footer>

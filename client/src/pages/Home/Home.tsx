@@ -254,18 +254,6 @@ const Home: React.FC = () => {
                                                 ))}
                                             </ul>
                                             )}
-                                            {/* <ul className="list-inline">
-                                                <li>
-                                                    <strong>Client:</strong> {item.client}
-                                                </li>
-                                                <li>
-                                                    <strong>Category:</strong> {item.category}
-                                                </li>
-                                            </ul> */}
-                                            {/* <button className="btn btn-primary btn-xl text-uppercase" data-bs-dismiss="modal" type="button">
-                                                <i className="fas fa-xmark me-1"></i>
-                                                Close Project
-                                            </button> */}
                                         </div>
                                     </div>
                                 </div>

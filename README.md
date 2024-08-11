@@ -4,6 +4,8 @@ FoodGuide is a web application designed to help tourists discover nearby restaur
 ![图片](https://github.com/user-attachments/assets/1f87977c-e745-4c30-b8db-42db573c17b3)
 ![图片](https://github.com/user-attachments/assets/3eac76c6-8ec6-41ad-9c28-7339039b8b80)
 ![图片](https://github.com/user-attachments/assets/fa312c29-99c0-40a5-8e7e-10a0d34e1093)
+![图片](https://github.com/user-attachments/assets/fcdbe2f7-0b5a-454d-b619-d00531712552)
+![图片](https://github.com/user-attachments/assets/9d3bce33-477e-4a28-af24-bdf25667e8ac)
 
 ## Setup and Running the Application
 

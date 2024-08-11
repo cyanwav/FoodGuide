@@ -334,8 +334,22 @@ const Home: React.FC = () => {
                                             {selectedRestaurant.openingHours.map((hour, i) => (
                                                 <li key={i}>{hour}</li>
                                             ))}
-                                    </ul>
+                                        </ul>
+                                        {/* <p><strong>Reviews:</strong></p> */}
+                                        <div className="border p-4 rounded">
+                                            {selectedRestaurant.reviews.map((review, index) => (
+                                                <div key={index} className="mb-3">
+                                                    <div className="d-flex justify-content-between">
+                                                        <strong>{review.author}</strong>
+                                                        <span className="text-muted">{review.relativetime}</span>
+                                                    </div>
+                                                    <p className="mt-2">{review.text}</p>
+                                                    {index < selectedRestaurant.reviews.length - 1 && <hr />} {/* Add horizontal line between reviews */}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
+                                    
                                 )}
                                 </div>
                             </div>

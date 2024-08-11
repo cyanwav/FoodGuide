@@ -10838,7 +10838,9 @@ p {
 }
 
 .page-section {
-  padding: 6rem 0;
+  /* padding: 6rem 0; */
+  padding-top: 6em;
+  padding-bottom: 0em;
 }
 .page-section h2.section-heading, .page-section .section-heading.h2 {
   font-size: 2.5rem;
@@ -11030,13 +11032,14 @@ header.masthead .masthead-subheading {
   background-color: #fff;
 }
 #restaurant .restaurant-item .restaurant-caption .restaurant-caption-heading {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   font-weight: 700;
   margin-bottom: 0;
 }
 #restaurant .restaurant-item .restaurant-caption .restaurant-caption-subheading {
-  font-style: italic;
+  font-size: 0.8em;
+  /* font-style: italic; */
   font-family: "Roboto Slab", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 

@@ -253,7 +253,7 @@ const Home: React.FC = () => {
             </section>
 
             {/* Leaflet Map */}
-            <section className="page-section bg-light" id='map'>
+            <section className="page-section bg-light" id='map' style={{ paddingBottom: '6em' }}>
                 <div className="container">
                     <div className="text-center">
                         <h2 className="section-heading text-uppercase">Restaurant Map</h2>
@@ -322,12 +322,12 @@ const Home: React.FC = () => {
                                 </div>
                                 <p className="item-intro text-muted mt-2 mb-1">{place.address}</p>
                                 {place.uri && (
-                                    <a href={place.uri} className="mb-1 d-block">
+                                    <a href={place.uri} className="mb-3 d-block">
                                         <i className="fas fa-link me-2"></i> 
                                         {place.uri}
                                     </a>
                                 )}
-                                {selectedRestaurant && selectedRestaurant.openingHours && (
+                                {selectedRestaurant && selectedRestaurant.openingHours && selectedRestaurant.openingHours.length > 0 && (
                                     <div>
                                         <p className='mb-0'><strong>Opening Hours:</strong></p>
                                         <ul className="list-unstyled mt-2">
@@ -335,21 +335,21 @@ const Home: React.FC = () => {
                                                 <li key={i}>{hour}</li>
                                             ))}
                                         </ul>
-                                        {/* <p><strong>Reviews:</strong></p> */}
-                                        <div className="border p-4 rounded">
-                                            {selectedRestaurant.reviews.map((review, index) => (
-                                                <div key={index} className="mb-3">
-                                                    <div className="d-flex justify-content-between">
-                                                        <strong>{review.author}</strong>
-                                                        <span className="text-muted">{review.relativetime}</span>
-                                                    </div>
-                                                    <p className="mt-2">{review.text}</p>
-                                                    {index < selectedRestaurant.reviews.length - 1 && <hr />} {/* Add horizontal line between reviews */}
-                                                </div>
-                                            ))}
-                                        </div>
                                     </div>
-                                    
+                                )}
+                                {selectedRestaurant && selectedRestaurant.reviews && selectedRestaurant.reviews.length > 0 && (
+                                    <div className="border p-4 rounded">
+                                        {selectedRestaurant.reviews.map((review, index) => (
+                                            <div key={index} className="mb-3">
+                                                <div className="d-flex justify-content-between">
+                                                    <strong>{review.author}</strong>
+                                                    <span className="text-muted">{review.relativetime}</span>
+                                                </div>
+                                                <p className="mt-2">{review.text}</p>
+                                                {index < selectedRestaurant.reviews.length - 1 && <hr />} {/* Add horizontal line between reviews */}
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
                                 </div>
                             </div>

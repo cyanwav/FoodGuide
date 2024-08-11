@@ -50,7 +50,7 @@ interface RestaurantDetails {
 
 // get photo
 async function fetchPlaceMedia(photoName: string): Promise<string> {
-  const parameters = 'maxHeightPx=400&maxWidthPx=400';
+  const parameters = 'maxHeightPx=1000&maxWidthPx=1000';
   const apiKey = process.env.REACT_APP_GOOGLE_API_KEY;
   const url = `https://places.googleapis.com/v1/${photoName}/media?${parameters}&key=${apiKey}&skipHttpRedirect=true`;
   try {
@@ -74,7 +74,12 @@ async function fetchPlaceMedia(photoName: string): Promise<string> {
 async function getInfoList(data: ResponseData): Promise<RestaurantInfo[]> {
   const infoList: RestaurantInfo[] = await Promise.all(
     data.places.map(async (place) => {
-      const imgUri = await fetchPlaceMedia(place.photos[0].name);  
+      if (!place.photos) {
+        return null;
+      }
+
+      const imgUri = await fetchPlaceMedia(place.photos[0].name);
+
       return {
         id: place.id,
         name: place.displayName.text,
@@ -86,7 +91,8 @@ async function getInfoList(data: ResponseData): Promise<RestaurantInfo[]> {
       };
     })
   );
-  return infoList;
+
+  return infoList.filter((info) => info !== null) as RestaurantInfo[];
 }
 
 // get several restaurants nearby

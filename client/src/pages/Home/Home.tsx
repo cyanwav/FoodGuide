@@ -38,7 +38,7 @@ const Home: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [response, setResponse] = useState<RestaurantInfo[] | null>(null);
     const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantDetails | null>(null);
-    const [selectedDistance, setSelectedDistance] = useState<number>(500); // 默认 500m
+    const [selectedDistance, setSelectedDistance] = useState<number>(500); // 500m by default
 
 
 
@@ -155,27 +155,8 @@ const Home: React.FC = () => {
             <nav className="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
                 <div className="container">
                     <a className="navbar-brand" href="#page-top">
-                        <img src="assets/img/navbar-logo2.svg" alt="FoodGuide Logo" />
+                        <img src="assets/img/navbar-logo3.svg" alt="FoodGuide Logo" />
                     </a>
-                    <button
-                        className="navbar-toggler"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#navbarResponsive"
-                        aria-controls="navbarResponsive"
-                        aria-expanded="false"
-                        aria-label="Toggle navigation"
-                    >
-                        Menu
-                        <i className="fas fa-bars ms-1"></i>
-                    </button>
-                    <div className="collapse navbar-collapse" id="navbarResponsive">
-                        <ul className="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
-                            <li className="nav-item">
-                                <a className="nav-link" href="#restaurant">Explore</a>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
             </nav>
 
@@ -195,8 +176,12 @@ const Home: React.FC = () => {
                         <h2 className="section-heading text-uppercase">Nearby Choices</h2>
                         <h3 className="section-subheading text-muted">Explore top-rated restaurants near you.</h3>
                     </div>
-                    <div className="mb-3">
-                        <label htmlFor="distance-filter" className="form-label">
+                    <div className="mb-4" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <label
+                            htmlFor="distance-filter"
+                            className="form-label"
+                            style={{ marginRight: '1rem' }} 
+                        >
                             Filter by distance:
                         </label>
                         <select
@@ -204,6 +189,7 @@ const Home: React.FC = () => {
                             className="form-select"
                             value={selectedDistance}
                             onChange={handleFilterChange}
+                            style={{ width: '150px' }} 
                         >
                             <option value={500}>500m</option>
                             <option value={1000}>1km</option>
@@ -234,29 +220,40 @@ const Home: React.FC = () => {
                         <p>Loading location...</p>
                         )}
                     </div>
-                    <div className="row">
-                        {response?.map((place, index) => (
-                            <div className="col-lg-4 col-sm-6 mb-4" key={index}>
+                    <div className="horizontal-scroll-container">
+                        <div className="row flex-nowrap">
+                            {response?.map((place, index) => (
+                            <div className="col-item col-lg-4 col-sm-6 mb-4" key={index}>
                                 <div className="restaurant-item">
-                                    <a className="restaurant-link" data-bs-toggle="modal" href={`#restaurantModal${index + 1}`} onClick={() => getRestaurantDetails(place.id)}>
-                                        <div className="restaurant-hover">
-                                            <div className="restaurant-hover-content"><i className="fas fa-plus fa-3x"></i></div>
-                                        </div>
-                                        <img className="img-fluid" src={place.imgUri} alt={place.name} />
-                                    </a>
-                                    <div className="restaurant-caption">
-                                        <div className="restaurant-caption-heading">{place.name}</div>
-                                        <div className="restaurant-caption-subheading text-muted">{place.address}</div>
+                                <a
+                                    className="restaurant-link"
+                                    data-bs-toggle="modal"
+                                    href={`#restaurantModal${index + 1}`}
+                                    onClick={() => getRestaurantDetails(place.id)}
+                                >
+                                    <div className="restaurant-hover">
+                                    <div className="restaurant-hover-content">
+                                        <i className="fas fa-plus fa-3x"></i>
+                                    </div>
+                                    </div>
+                                    <img className="img-fluid" src={place.imgUri} alt={place.name} />
+                                </a>
+                                <div className="restaurant-caption">
+                                    <div className="restaurant-caption-heading">{place.name}</div>
+                                    <div className="restaurant-caption-subheading text-muted">
+                                    {place.address}
                                     </div>
                                 </div>
+                                </div>
                             </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
 
             {/* Leaflet Map */}
-            <section className="map-section">
+            <section className="page-section bg-light" id='map'>
                 <div className="container">
                     <div className="text-center">
                         <h2 className="section-heading text-uppercase">Restaurant Map</h2>
@@ -281,7 +278,7 @@ const Home: React.FC = () => {
                                         <div>
                                             <h3>{place.name}</h3>
                                             <p>{place.address}</p>
-                                            <p>Rating: {place.rating}</p>
+                                            <p>Rating: {place.rating.toFixed(1)}</p>
                                         </div>
                                     </Popup>
                                 </Marker>
@@ -304,33 +301,49 @@ const Home: React.FC = () => {
             {response?.map((place, index) => (
                 <div className="restaurant-modal modal fade" id={`restaurantModal${index + 1}`} tabIndex={-1} role="dialog" aria-hidden="true" key={index}>
                     <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="close-modal" data-bs-dismiss="modal">
-                                <img src="assets/img/close-icon.svg" alt="Close modal" />
-                            </div>
-                            <div className="container">
-                                <div className="row justify-content-center">
-                                    <div className="col-lg-8">
-                                        <div className="modal-body">
-                                            <h2 className="text-uppercase">{place.name}</h2>
-                                            <p className="item-intro text-muted">{place.address}</p>
-                                            <img className="img-fluid d-block mx-auto" src={place.imgUri} alt={place.name} />
-                                            <p>{place.rating}</p>
-                                            <a href={place.uri}>Website</a>
-                                            {selectedRestaurant && selectedRestaurant.openingHours && (
-                                            <ul>
-                                                {selectedRestaurant.openingHours.map((hour, i) => (
+                    <div className="modal-content">
+                        <div className="close-modal" data-bs-dismiss="modal">
+                        <img src="assets/img/close-icon.svg" alt="Close modal" />
+                        </div>
+                        <div className="container">
+                        <div className="row justify-content-center">
+                            <div className="col-lg-8">
+                            <div className="modal-body">
+                                <div className="img-container">
+                                    <img
+                                    className="img-fluid"
+                                    src={place.imgUri}
+                                    alt={place.name}
+                                    />
+                                </div>
+                                <div className="d-flex justify-content-between align-items-center mt-3">
+                                    <h2 className="text-uppercase mb-0">{place.name}</h2>
+                                    <p className="item-rating mb-0">{place.rating}</p>
+                                </div>
+                                <p className="item-intro text-muted mt-2 mb-1">{place.address}</p>
+                                {place.uri && (
+                                    <a href={place.uri} className="mb-1 d-block">
+                                        <i className="fas fa-link me-2"></i> 
+                                        {place.uri}
+                                    </a>
+                                )}
+                                {selectedRestaurant && selectedRestaurant.openingHours && (
+                                    <div>
+                                        <p className='mb-0'><strong>Opening Hours:</strong></p>
+                                        <ul className="list-unstyled mt-2">
+                                            {selectedRestaurant.openingHours.map((hour, i) => (
                                                 <li key={i}>{hour}</li>
-                                                ))}
-                                            </ul>
-                                            )}
-                                        </div>
+                                            ))}
+                                    </ul>
                                     </div>
+                                )}
                                 </div>
                             </div>
                         </div>
+                        </div>
                     </div>
                 </div>
+            </div>
             ))}
 
             {/* Bootstrap core JS */}

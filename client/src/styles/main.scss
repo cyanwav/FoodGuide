@@ -2,7 +2,155 @@
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 // Custom styles
-$primary-color: #ffd755;
 body {
-  background-color: $primary-color;
+  background-color: #212529;
+}
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: #ffc800;
+  --bs-btn-border-color: #ffc800;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #d9aa00;
+  --bs-btn-hover-border-color: #cca000;
+  --bs-btn-focus-shadow-rgb: 255, 208, 38;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #cca000;
+  --bs-btn-active-border-color: #bf9600;
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: #ffc800;
+  --bs-btn-disabled-border-color: #ffc800;
+}
+.btn-xl {
+  padding: 1.25rem 2.5rem;
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+.navbar {
+  --bs-navbar-padding-x: 0;
+  --bs-navbar-padding-y: 0.1rem;
+  --bs-navbar-color: rgba(0, 0, 0, 0.55);
+  --bs-navbar-hover-color: rgba(0, 0, 0, 0.7);
+  --bs-navbar-disabled-color: rgba(0, 0, 0, 0.3);
+  --bs-navbar-active-color: rgba(0, 0, 0, 0.9);
+  --bs-navbar-brand-padding-y: 0.1rem;
+  --bs-navbar-brand-margin-end: 1rem;
+  --bs-navbar-brand-font-size: 1.25rem;
+  --bs-navbar-brand-color: rgba(0, 0, 0, 0.9);
+  --bs-navbar-brand-hover-color: rgba(0, 0, 0, 0.9);
+  --bs-navbar-nav-link-padding-x: 0.5rem;
+  --bs-navbar-toggler-padding-y: 0.25rem;
+  --bs-navbar-toggler-padding-x: 0.75rem;
+  --bs-navbar-toggler-font-size: 1.25rem;
+  --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  --bs-navbar-toggler-border-color: rgba(0, 0, 0, 0.1);
+  --bs-navbar-toggler-border-radius: 0.375rem;
+  --bs-navbar-toggler-focus-width: 0.25rem;
+  --bs-navbar-toggler-transition: box-shadow 0.15s ease-in-out;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--bs-navbar-padding-y) var(--bs-navbar-padding-x);
+}
+#mainNav {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  background-color: #212529;
+}
+header.masthead .masthead-heading {
+  font-size: 3.25rem;
+  font-weight: 700;
+  line-height: 3.25rem;
+  margin-bottom: 2rem;
+  padding-bottom: 3rem;
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+
+.horizontal-scroll-container {
+  overflow-x: auto; 
+  white-space: nowrap; 
+  padding: 10px;
+}
+
+.row.flex-nowrap {
+  display: flex; 
+  flex-wrap: nowrap; 
+}
+
+.col-item {
+  flex: 0 0 auto; 
+  width: 400px; 
+  height: 400px;
+  margin-right: 10px;
+}
+
+.restaurant-item {
+  height: 100%;
+  width: 100%; 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.restaurant-link {
+  height: 100%;
+}
+
+.restaurant-link img {
+  max-width: 100%;
+  max-height: 100%; 
+  object-fit: cover; 
+}
+
+.restaurant-caption {
+  padding: 10px;
+}
+
+
+
+
+.img-container {
+  width: 100%;
+  height: 400px;
+  margin: 0 auto 20px; 
+  overflow: hidden;
+  display: flex; 
+  justify-content: flex-start; 
+}
+
+.img-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-body {
+  text-align: left;
+}
+
+.d-flex .item-rating {
+  margin-left: auto; 
+  color:#ffc800;
+  font-size: 3rem;
+}
+
+.list-unstyled {
+  padding-left: 0;
+  list-style: none; 
+}
+
+.modal-body a {
+  display: block;
+  margin-top: 10px; 
+}
+
+h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-weight: 700;
+  line-height: 1.2;
 }

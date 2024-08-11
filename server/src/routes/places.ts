@@ -176,8 +176,12 @@ async function getPlaceDetails(id: string) {
 
 // Define routes
 async function apiRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-  
+    
     // root
+    fastify.get('/', async (request, reply) => {
+      return { message: 'Backend is running!' }
+    });
+
     fastify.get('/api', async (request, reply) => {
         return { message: 'Welcome to FoodGuide API!' };
     });

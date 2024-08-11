@@ -91,6 +91,7 @@ const Home: React.FC = () => {
         console.log(JSON.stringify({ latitude, longitude, distance }));
         try {
             const response = await fetch('http://localhost:3000/api/res', {
+            // const response = await fetch('http://backend:3000/api/res', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,28 +1,32 @@
-const Fastify = require('fastify');
-const cors = require('@fastify/cors');
-const dotenv = require('dotenv');
-const placeRoutes = require('./routes/places');
+import Fastify, { FastifyInstance } from 'fastify';
+import cors from '@fastify/cors';
+import dotenv from 'dotenv';
+import placeRoutes from './routes/places';
 
 dotenv.config();
 
-const server = Fastify();
+const server: FastifyInstance = Fastify({
+  logger: true
+});
 
 server.register(cors, {
-  origin: '*'
+  origin: true 
 });
 
 server.register(placeRoutes);
 
 // Start the server and handle the promise
 async function startServer() {
-  server.listen({ port: 3000 })
-  .then(() => {
-    console.log('Server listening on http://localhost:3000');
-  })
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+  server.listen({ port: 3000 }) 
+  // server.listen({ port: 3000, host: '0.0.0.0' }) 
+    .then(() => {
+      console.log('Server listening on http://localhost:3000');
+      // console.log('Server listening on http://0.0.0.0:3000');
+    })
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
 }
 
 startServer();
